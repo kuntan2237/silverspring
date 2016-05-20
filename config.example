@@ -1,0 +1,16 @@
+# This project will create an instance for each sections
+#
+# Example:
+#    [Name as you wish]
+#    desc: Description for this instance
+#    apiKey : xxxxxx
+#    secKey : XXXXXX
+#    exchange : Exchange API folder name
+#    strategy : Strategy name
+
+[okcoin.cn_half-half-balance]
+desc: [IN TEST] 50/50 balanced on okcoin.cn
+apiKey : xxxxxx
+secKey : XXXXXX
+exchange : okcoin_CN
+strategy : halfTrading
