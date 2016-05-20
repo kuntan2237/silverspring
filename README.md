@@ -17,7 +17,7 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 * Don't test with real money in your account
 
 # Features
-* Exchanges website
+* Exchanges websites
 	- www.okcoin.cn, REST APIs
 * Strategies
 	- 50/50 balanced
@@ -38,6 +38,9 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 * [ ] Multiple Index
 
 # Release Plan
-## 1.0
-- [Feature]
-- [Fix]
+## 1.1 (WW26)
+- [Fix #1] Python crash with HTTP request error when network is unstable
+- [Feature] Multi-level logs
+- [Enhance] 50/50 balanced strategy
+- [Feature] Grid trade
+
