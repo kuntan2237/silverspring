@@ -35,7 +35,8 @@ def halfBalanced(subject):
     else:
         # send out trade
         result = subject.tradeMarketPrice('btc_cny', \
-                                          info['btc'] - total / 2)
+                                          info['btc'] - total / 2, \
+                                          price['last'])
 
     # check status
     return True if result['result'] else False

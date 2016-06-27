@@ -28,7 +28,7 @@ class okcoinCN:
         params['sign'] = signMd5(params, self.__secretKey)
         return httpsPost(self.__url, self.__USERINFO, params)
 
-    def __API_trade(self, symbol, tradeType, amount, price=''):
+    def __API_trade(self, symbol, tradeType, amount='', price=''):
         params = {
             'api_key' : self.__apiKey,
             'symbol' : symbol,
@@ -59,7 +59,12 @@ class okcoinCN:
             quote[x] = float(data['ticker'][x])
         return quote
 
-    def tradeMarketPrice(self, symbol, amount):
-        tradeType = 'sell_market' if amount > 0 else 'buy_market'
-        result = self.__API_trade(symbol, tradeType, amount)
+    def tradeMarketPrice(self, symbol, amount, price):
+        if amount > 0:
+            result = self.__API_trade(symbol, 'sell_market', amount)
+        else:
+            result = self.__API_trade(symbol, 'buy_market', price=abs(amount) * price)
         return result
+
+    def tradeLimitPrice(self, symbol, amount, price):
+        pass
