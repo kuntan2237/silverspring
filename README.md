@@ -23,8 +23,14 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 	- 50/50 balanced
 
 # To Be Implemented
-* [ ] Multi-level logs
+* [ ] Quotation database
+* [ ] GUI
+* [ ] Multiple Index
 
+# Release Plan
+## 2.0 (Target at WW28'16)
+- [Feature] Grid trade
+- [Feature] Multi-level logs
 >	Type     | Description 
 >	-------- | -------------
 	Critical | That’s bad, you may lose money when you see this
@@ -33,14 +39,9 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 	Info     | For user's information
 	Debug    | Use this for developing this project
 
-* [ ] Quotation database
-* [ ] GUI
-* [ ] Multiple Index
-
-# Release Plan
-## 1.1 (WW26)
+## 1.1 (Released at WW27'16)
 - [Fix #1] Python crash with HTTP request error when network is unstable
+- [Fix #2] Exit with buy_market
 - [Feature] Multi-level logs
 - [Enhance] 50/50 balanced strategy
-- [Feature] Grid trade
 
