@@ -5,12 +5,15 @@
 #    desc: Description for this instance
 #    apiKey : xxxxxx
 #    secKey : XXXXXX
-#    exchange : Exchange API folder name
-#    strategy : Strategy name
+#    exchange: Exchange API folder name
+#    strategy: Strategy name
 
-[okcoin.cn_half-half-balance]
-desc: [IN TEST] 50/50 balanced on okcoin.cn
-apiKey : xxxxxx
-secKey : XXXXXX
-exchange : okcoin_CN
-strategy : halfTrading
+[global]
+desc: Global configurations
+
+[trade_test]
+desc: 50/50 balanced on okcoin.cn
+apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+exchange: okcoinCN
+strategy: halfBalanced

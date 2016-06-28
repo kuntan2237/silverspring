@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # This is the entry of Silver Sprint project
 # It crates a timer to start the trading thread
