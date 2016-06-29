@@ -2,6 +2,7 @@
 # API: https://www.okcoin.cn/about/rest_api.do
 # Error code : https://www.okcoin.cn/about/rest_request.do
 
+import logging
 from common import *
 
 class okcoinCN:
@@ -11,10 +12,11 @@ class okcoinCN:
     __USERINFO = '/api/v1/userinfo.do'
     __TRADE    = '/api/v1/trade.do'
 
-    def __init__(self, param):
+    def __init__(self, param, logger):
         self.__url = 'www.okcoin.cn'
         self.__apiKey = param['apikey']
         self.__secretKey = param['secretkey']
+        self.__logger = logger
 
     def __API_ticker(self,symbol = ''):
         params=''
@@ -64,7 +66,10 @@ class okcoinCN:
             result = self.__API_trade(symbol, 'sell_market', amount)
         else:
             result = self.__API_trade(symbol, 'buy_market', price=abs(amount) * price)
-        return result
+
+        self.__logger.debug('Trade %.2f with market price CNY %.2f, result %r'
+                            % (amount, price, result['result']))
+        return result['result']
 
     def tradeLimitPrice(self, symbol, amount, price):
         pass

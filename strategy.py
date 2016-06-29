@@ -1,24 +1,8 @@
 # This file impliments various trading strategies
-# - 50-50 balanced
-
-'''
-def halfBalancedTrading(tradeParams):
-    url = 'www.okcoin.cn'
-    apikey = 'AAAAAA'
-    secretKey = 'XXXXXX'
-    target = okcoinSpot(url, apikey, secretKey)
-    trans = halfHalfTrading()
-    if trans.verify(target.userInfo()):
-        target.trade(trans.trade())
-        if trans.status():
-            print('SUCCESS!')
-        else:
-            trans.cancel()
-
-'''
+# - 50-50 dynamic re-balanced
 
 # https://xueqiu.com/3483147395/62338841
-def halfBalanced(subject):
+def halfBalanced(subject, logger):
     result = {}
     MIN_BTC = 0.01
     
@@ -28,15 +12,17 @@ def halfBalanced(subject):
 
     # check signal
     total = info['cny'] / price['last'] + info['btc']
-    if abs(info['btc'] - total / 2) < MIN_BTC:
-        # do nothing
-        print("No trade - " + str(info['btc'] - total / 2))
+    if abs(info['btc'] - total / 2) < MIN_BTC: # do nothing
+        logger.info('Balanced, need %.4f BTC, threashold %.2f'
+                    % (info['btc'] - total / 2, MIN_BTC))
         result['result'] = True
-    else:
-        # send out trade
+    else: # send out trade
+        logger.info('Trading, need %.4f BTC, threashold %.2f'
+                    % (info['btc'] - total / 2, MIN_BTC))
         result = subject.tradeMarketPrice('btc_cny', \
                                           info['btc'] - total / 2, \
                                           price['last'])
+        logger.info('Trading completed, result %r', result)
 
     # check status
     return True if result['result'] else False
