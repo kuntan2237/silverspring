@@ -22,13 +22,13 @@ class okcoinCN:
         params=''
         if symbol:
             params = 'symbol=%(symbol)s' %{'symbol':symbol}
-        return httpsGet(self.__url, self.__TICKER, params)
+        return httpsGet(self.__url, self.__TICKER, params, self.__logger)
 
     def __API_userinfo(self):
         params ={}
         params['api_key'] = self.__apiKey
         params['sign'] = signMd5(params, self.__secretKey)
-        return httpsPost(self.__url, self.__USERINFO, params)
+        return httpsPost(self.__url, self.__USERINFO, params, self.__logger)
 
     def __API_trade(self, symbol, tradeType, amount='', price=''):
         params = {
@@ -42,7 +42,7 @@ class okcoinCN:
             params['amount'] = "%.2f" % amount
             
         params['sign'] = signMd5(params, self.__secretKey)
-        return httpsPost(self.__url, self.__TRADE, params)
+        return httpsPost(self.__url, self.__TRADE, params, self.__logger)
     
     def getAccount(self):
         account = {}
@@ -69,7 +69,7 @@ class okcoinCN:
 
         self.__logger.debug('Trade %.2f with market price CNY %.2f, result %r'
                             % (amount, price, result['result']))
-        return result['result']
+        return result
 
     def tradeLimitPrice(self, symbol, amount, price):
         pass

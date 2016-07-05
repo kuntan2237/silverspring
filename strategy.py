@@ -12,13 +12,17 @@ def halfBalanced(subject, logger):
 
     # check signal
     total = info['cny'] / price['last'] + info['btc']
+    if info['btc'] < total / 2:
+        logger.info('Need buy %.4f BTC, threashold %.2f'
+                    % (abs(info['btc'] - total / 2), MIN_BTC))
+    else:
+        logger.info('Need sell %.4f BTC, threashold %.2f'
+                    % (info['btc'] - total / 2, MIN_BTC))
+
     if abs(info['btc'] - total / 2) < MIN_BTC: # do nothing
-        logger.info('Balanced, need %.4f BTC, threashold %.2f'
-                    % (info['btc'] - total / 2, MIN_BTC))
         result['result'] = True
+        logger.debug('Does not reach threashold, do nothing')
     else: # send out trade
-        logger.info('Trading, need %.4f BTC, threashold %.2f'
-                    % (info['btc'] - total / 2, MIN_BTC))
         result = subject.tradeMarketPrice('btc_cny', \
                                           info['btc'] - total / 2, \
                                           price['last'])

@@ -8,28 +8,34 @@ import urllib
 import json
 import hashlib
 import logging
+import time
 
 HTTP_TIMEOUT=10
 
-def httpsGet(url, resource, params=''):
+def httpsGet(url, resource, params, logger):
     conn = http.client.HTTPSConnection(url, timeout=HTTP_TIMEOUT)
     conn.request("GET", resource + '?' + params)
     response = conn.getresponse()
     data = response.read().decode('utf-8')
     return json.loads(data)
 
-def httpsPost(url, resource, params):
-     headers = {
-            "Content-type" : "application/x-www-form-urlencoded",
-     }
-     conn = http.client.HTTPSConnection(url, timeout=HTTP_TIMEOUT)
-     temp_params = urllib.parse.urlencode(params)
-     conn.request("POST", resource, temp_params, headers)
-     response = conn.getresponse()
-     data = response.read().decode('utf-8')
-     params.clear()
-     conn.close()
-     return json.loads(data)
+def httpsPost(url, resource, params, logger):
+    while True:
+        try:
+            headers = {
+                "Content-type" : "application/x-www-form-urlencoded",
+            }
+            conn = http.client.HTTPSConnection(url, timeout=HTTP_TIMEOUT)
+            temp_params = urllib.parse.urlencode(params)
+            conn.request("POST", resource, temp_params, headers)
+            response = conn.getresponse()
+            data = response.read().decode('utf-8')
+            params.clear()
+            conn.close()
+            return json.loads(data)
+        except:
+            logger.error('Oops! Network is unstable, retry after 30 seconds...')
+            time.sleep(30)
 
 def signMd5(params, secretKey):
     sign = ''
