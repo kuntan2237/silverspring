@@ -52,14 +52,19 @@ if __name__ == "__main__":
     # start trading instances
     for inst, param in conf.items():
         loop = True
+        # setup stragety logs
         con = True if param['showlog'].lower() == 'true' else False
         logger = getLogger('SILV.' + inst, param['loglevel'],
                            file = os.path.join(LOG_DIR, inst + '.log'),
                            console = not globCon and con)
         logger.info('Starting trade: ' + inst)
         logger.info('Trade description: ' + param['desc'])
+        # check stragety enabled flag
+        if param['enable'].lower() != 'yes':
+            logger.info('Strategy disabled by config file')
+            continue
         while loop:
             exchange = eval(param['exchange'])(param, logger)
-            loop = eval(param['strategy'])(exchange, logger)
+            loop = eval(param['strategy'])(exchange, param, logger)
             logger.debug('Sleep 10 seconds...')
             time.sleep(10)

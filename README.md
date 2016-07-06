@@ -26,16 +26,19 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 	- www.okcoin.cn, REST APIs
 * Strategies
 	- 50/50 balanced
+	- Grid trade
 
 # To Be Implemented
 * [ ] Quotation database
+* [ ] Multiple position in single accout
 * [ ] GUI
 * [ ] Multiple Index
 
 # Release Plan
 ## 2.0 (Target at WW28'16)
+- [Fix #1] Python crash with HTTP request error when network is unstable
 - [Feature] Create genConfigSample.py to generate config.sample
-- [TODO] Grid trade
+- [Feature] Grid trade
 - [Feature] Multi-level logs
 
 >	Type     | Description 
@@ -46,7 +49,6 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 	Info     | For user's information
 	Debug    | Use this for developing this project
 
-- [Fix #1] Python crash with HTTP request error when network is unstable
 
 ## 1.1 (Released at WW27'16)
 - [Fix #2] Exit with buy_market

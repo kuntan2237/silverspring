@@ -13,11 +13,16 @@ import time
 HTTP_TIMEOUT=10
 
 def httpsGet(url, resource, params, logger):
-    conn = http.client.HTTPSConnection(url, timeout=HTTP_TIMEOUT)
-    conn.request("GET", resource + '?' + params)
-    response = conn.getresponse()
-    data = response.read().decode('utf-8')
-    return json.loads(data)
+    while True:
+        try:
+            conn = http.client.HTTPSConnection(url, timeout=HTTP_TIMEOUT)
+            conn.request("GET", resource + '?' + params)
+            response = conn.getresponse()
+            data = response.read().decode('utf-8')
+            return json.loads(data)
+        except:
+            logger.error('Oops! HTTPS GET failed, retry after 30 seconds...')
+            time.sleep(30)
 
 def httpsPost(url, resource, params, logger):
     while True:
@@ -34,7 +39,7 @@ def httpsPost(url, resource, params, logger):
             conn.close()
             return json.loads(data)
         except:
-            logger.error('Oops! Network is unstable, retry after 30 seconds...')
+            logger.error('Oops! HTTPS POST, retry after 30 seconds...')
             time.sleep(30)
 
 def signMd5(params, secretKey):
