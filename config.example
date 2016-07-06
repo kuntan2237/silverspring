@@ -2,6 +2,7 @@
 #
 # Example of test instance:
 #    [Trade strategy] (suggest to be <=8 letters for logging formats)
+#    enable: yes
 #    desc: Description for this instance
 #    apiKey : xxxxxx
 #    secKey : XXXXXX
@@ -16,6 +17,7 @@ logLevel: DEBUG
 showLog: True
 
 [REBLNCE]
+enable: no
 desc: 50/50 dynamic re-balanced on okcoin.cn
 apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -23,3 +25,16 @@ exchange: okcoinCN
 strategy: halfBalanced
 logLevel: DEBUG
 showLog: TRUE
+
+[GRID]
+enable: yes
+desc: Grid trading on okcoin.cn
+apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+exchange: okcoinCN
+strategy: gradTrading
+logLevel: DEBUG
+showLog: TRUE
+top: 5185.77
+bottom: 2335
+stop: 2000
