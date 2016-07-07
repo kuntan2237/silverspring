@@ -16,14 +16,30 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 * You have fully responsibility for each dollar in your wallet
 * Don't test with real money in your account
 
+# How To Start
+
+1. Copy config.sample to config, don't forget to change your apikey and secretkey
+ * Set ./silver.py to proper permission and start it
+
 # Features
-* Exchanges website
+* Exchanges websites
 	- www.okcoin.cn, REST APIs
 * Strategies
 	- 50/50 balanced
+	- Grid trade
 
 # To Be Implemented
-* [ ] Multi-level logs
+* [ ] Quotation database
+* [ ] Multiple position in single accout
+* [ ] GUI
+* [ ] Multiple Index
+
+# Release Plan
+## 2.0 (Target at WW28'16)
+- [Fix #1] Python crash with HTTP request error when network is unstable
+- [Feature] Create genConfigSample.py to generate config.sample
+- [Feature] Grid trade
+- [Feature] Multi-level logs
 
 >	Type     | Description 
 >	-------- | -------------
@@ -33,11 +49,9 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 	Info     | For user's information
 	Debug    | Use this for developing this project
 
-* [ ] Quotation database
-* [ ] GUI
-* [ ] Multiple Index
 
-# Release Plan
-## 1.0
-- [Feature]
-- [Fix]
+## 1.1 (Released at WW27'16)
+- [Fix #2] Exit with buy_market
+- [Feature] Multi-level logs
+- [Enhance] 50/50 balanced strategy
+

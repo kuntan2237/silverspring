@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # This is the entry of Silver Sprint project
 # It crates a timer to start the trading thread
@@ -8,22 +8,26 @@
 #     strategy.py - trading strategies
 #     okcoinCN.py - okcoin.cn APIs
 
+import os
 import sys
 import time
+import logging
 import configparser
 
 from common import *
 from strategy import *
 from okcoinCN import *
 
-def usage():
-    pass
+BASE_DIR = os.path.dirname(__file__)
+CONF_FILE = os.path.join(BASE_DIR, 'config')
+LOG_DIR = os.path.join(BASE_DIR, 'log')
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
 
 def getConfig():
     dict = {}
-
     conf = configparser.ConfigParser()
-    conf.read('./config')
+    conf.read(CONF_FILE)
 
     for section in conf.sections():
         dict[section] = {}
@@ -35,20 +39,32 @@ def getConfig():
                 sys.exit(-1)
     return dict
 
-def initTrade(config):
-    print("Initialize trades...")
-    # init here
-
 if __name__ == "__main__":
     conf = getConfig()
-    initTrade(conf.pop('global'))
+    globConf = conf.pop('GLOBAL')
+
+    globCon = True if globConf['showlog'].lower() == 'true' else False
+    logger = getLogger('SILV', globConf['loglevel'],
+                       file = os.path.join(LOG_DIR, 'silver.log'),
+                       console = globCon)
+    logger.info('Logging initiated within %s level.' % globConf['loglevel'])
 
     # start trading instances
     for inst, param in conf.items():
         loop = True
-        print("Trade Instance: " + inst)
-        print("Description: " + param['desc'])
+        # setup stragety logs
+        con = True if param['showlog'].lower() == 'true' else False
+        logger = getLogger('SILV.' + inst, param['loglevel'],
+                           file = os.path.join(LOG_DIR, inst + '.log'),
+                           console = not globCon and con)
+        logger.info('Starting trade: ' + inst)
+        logger.info('Trade description: ' + param['desc'])
+        # check stragety enabled flag
+        if param['enable'].lower() != 'yes':
+            logger.info('Strategy disabled by config file')
+            continue
         while loop:
-            exchange = eval(param['exchange'])(param)
-            loop = eval(param['strategy'])(exchange)
-            time.sleep(5)
+            exchange = eval(param['exchange'])(param, logger)
+            loop = eval(param['strategy'])(exchange, param, logger)
+            logger.debug('Sleep 10 seconds...')
+            time.sleep(10)

@@ -1,16 +1,40 @@
 # This project will create an instance for each sections
 #
-# Example:
-#    [Name as you wish]
+# Example of test instance:
+#    [Trade strategy] (suggest to be <=8 letters for logging formats)
+#    enable: yes
 #    desc: Description for this instance
 #    apiKey : xxxxxx
 #    secKey : XXXXXX
-#    exchange : Exchange API folder name
-#    strategy : Strategy name
+#    exchange: Exchange API folder name
+#    strategy: Strategy name
+#    logLevel: [CRITICAL|ERROR|WARNING|INFO|DEBUG]
+#    showLog: [TRUE|FALSE] (print log in console)
 
-[okcoin.cn_half-half-balance]
-desc: [IN TEST] 50/50 balanced on okcoin.cn
-apiKey : xxxxxx
-secKey : XXXXXX
-exchange : okcoin_CN
-strategy : halfTrading
+[GLOBAL]
+desc: Global configurations
+logLevel: DEBUG
+showLog: True
+
+[REBLNCE]
+enable: no
+desc: 50/50 dynamic re-balanced on okcoin.cn
+apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+exchange: okcoinCN
+strategy: halfBalanced
+logLevel: DEBUG
+showLog: TRUE
+
+[GRID]
+enable: yes
+desc: Grid trading on okcoin.cn
+apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+exchange: okcoinCN
+strategy: gradTrading
+logLevel: DEBUG
+showLog: TRUE
+top: 5185.77
+bottom: 2335
+stop: 2000
