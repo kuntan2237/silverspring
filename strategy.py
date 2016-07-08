@@ -40,13 +40,15 @@ def gradTrading(subject, param, logger):
         btm = float(param['bottom'])
         stop = float(param['stop'])
     except ValueError:
-        logger.error('Incorrect top and bottom price')
+        logger.error('Incorrect top and bottom price, stop trade...')
         return False
 
     # get data
     info = subject.getAccount()
     price = subject.getSpotQuote()
     total = info['cny'] / price['last'] + info['btc']
+    logger.info('Current CNY %.2f, BTC %.4f, total CNY %.2f'
+                % (info['cny'], info['btc'], total * price['last']))
 
     # stop loss
     if total * price['last'] <= stop:
@@ -56,13 +58,13 @@ def gradTrading(subject, param, logger):
     # check signal
     currPos = info['btc'] / total * 100
     expPos = (1 - (price['last'] - btm) / (top - btm)) * 100
-    logger.info('Current position %d%%, expect %d%%' % (currPos, expPos))
+    logger.debug('Current position %d%%, expect %d%%' % (currPos, expPos))
     expBtc = total * expPos / 100
     if info['btc'] < expBtc:
-        logger.info('Need buy %.4f BTC, threashold %.2f'
+        logger.debug('Need buy %.4f BTC, threashold %.2f'
                     % (abs(info['btc'] - expBtc), MIN_BTC))
     else:
-        logger.info('Need sell %.4f BTC, threashold %.2f'
+        logger.debug('Need sell %.4f BTC, threashold %.2f'
                     % (info['btc'] - expBtc, MIN_BTC))
 
     # trade
