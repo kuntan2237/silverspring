@@ -35,7 +35,7 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 
 # Release Plan
 ## 2.1 (Target at WW30'16)
-- [ ] Multi-threading for different strategies
+- [Feature] Multi-threading for strategies
 - [ ] Sqlite database
 - [ ] History price data
 
