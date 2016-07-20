@@ -1,5 +1,9 @@
 # This file impliments various trading strategies
 # - 50-50 dynamic re-balanced
+# - Grid trading
+# - Get BTC price
+
+from common import *
 
 # https://xueqiu.com/3483147395/62338841
 def halfBalanced(subject, param, logger):
@@ -79,3 +83,13 @@ def gradTrading(subject, param, logger):
 
     # check status
     return True if result['result'] else False
+
+# Get BTC price
+def getPrice(subject, param, logger):
+    conn = sqlLog()
+    # get data
+    price = subject.getSpotQuote()
+    conn.price(price['date'], price['buy'], price['last'], price['sell'],
+               price['vol'])
+    logger.info('Current price saved.')
+    return True

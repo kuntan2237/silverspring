@@ -38,3 +38,13 @@ showLog: TRUE
 top: 5185.77
 bottom: 2335
 stop: 2000
+
+[PRICE]
+enable: yes
+desc: Get on okcoin.cn
+apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+exchange: okcoinCN
+strategy: getPrice
+logLevel: DEBUG
+showLog: TRUE

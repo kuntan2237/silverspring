@@ -7,6 +7,7 @@
 #     common.py   - Independent tools like http/https and checksum
 #     strategy.py - trading strategies
 #     okcoinCN.py - okcoin.cn APIs
+#     config.example - an example of config file used by project
 
 import os
 import sys
@@ -85,6 +86,7 @@ if __name__ == "__main__":
                            file = os.path.join(LOG_DIR, inst + '.log'),
                            console = not globCon and con)
         thread = tradeThread(param, tdLogger)
+        #thread.run()
         thread.start()
         threads.append(thread)
 

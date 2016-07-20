@@ -57,7 +57,7 @@ class okcoinCN:
         quote = {}
         data = self.__API_ticker()
         quote['date'] = int(data['date'])
-        for x in ['buy', 'sell', 'last']:
+        for x in ['buy', 'sell', 'last', 'vol']:
             quote[x] = float(data['ticker'][x])
         return quote
 
