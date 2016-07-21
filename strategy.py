@@ -88,8 +88,9 @@ def gradTrading(subject, param, logger):
 def getPrice(subject, param, logger):
     conn = sqlLog()
     # get data
+    info = subject.getAccount()
     price = subject.getSpotQuote()
     conn.price(price['date'], price['buy'], price['last'], price['sell'],
-               price['vol'])
+               price['vol'], info['cny'], info['btc'])
     logger.info('Current price saved.')
     return True

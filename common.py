@@ -86,12 +86,14 @@ class sqlLog:
         base_dir = os.path.dirname(__file__)
         date = datetime.date.today()
         return os.path.join(base_dir, 'data_' + date.strftime('%Y') + '.sqlite')
-    def price(self, date, buy, last, sell, vol):
+    def price(self, date, buy, last, sell, vol, my_cny, my_btc):
         conn = sqlite3.connect(self.__getDbFile())
         c = conn.cursor()
+        # "alter table price add column my_cny real;"
         c.execute('CREATE TABLE IF NOT EXISTS price'
-                  '(date integer, buy real, last real, sell real, vol real)')
-        c.execute('INSERT INTO price VALUES (?,?,?,?,?)',
-                  (date, buy, last, sell, vol))
+                  '(date integer, buy real, last real, sell real, vol real, '
+                  'my_cny real, my_btc real)')
+        c.execute('INSERT INTO price VALUES (?,?,?,?,?,?,?)',
+                  (date, buy, last, sell, vol, my_cny, my_btc))
         conn.commit()
         conn.close()
