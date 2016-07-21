@@ -42,7 +42,11 @@ class okcoinCN:
             params['amount'] = "%.2f" % amount
             
         params['sign'] = signMd5(params, self.__secretKey)
-        return httpsPost(self.__url, self.__TRADE, params, self.__logger)
+        result = httpsPost(self.__url, self.__TRADE, params, self.__logger)
+        if result['result']:
+            sqlLog().trade(int(time.time()), params['symbol'], params['type'],
+                           price, amount)
+        return result['result']
     
     def getAccount(self):
         account = {}
@@ -66,9 +70,8 @@ class okcoinCN:
             result = self.__API_trade(symbol, 'sell_market', amount)
         else:
             result = self.__API_trade(symbol, 'buy_market', price=abs(amount) * price)
-
         self.__logger.debug('Trade %.2f with market price CNY %.2f, result %r'
-                            % (amount, price, result['result']))
+                            % (amount, price, result))
         return result
 
     def tradeLimitPrice(self, symbol, amount, price):

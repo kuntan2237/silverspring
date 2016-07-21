@@ -31,9 +31,7 @@ def halfBalanced(subject, param, logger):
                                           info['btc'] - total / 2, \
                                           price['last'])
         logger.info('Trading completed, result %r', result)
-
-    # check status
-    return True if result['result'] else False
+    return result
 
 # Grid trading
 def gradTrading(subject, param, logger):
@@ -80,9 +78,7 @@ def gradTrading(subject, param, logger):
                                           info['btc'] - expBtc, \
                                           price['last'])
         logger.info('Trading completed, result %r', result)
-
-    # check status
-    return True if result['result'] else False
+    return result
 
 # Get BTC price
 def getPrice(subject, param, logger):

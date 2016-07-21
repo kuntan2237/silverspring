@@ -39,7 +39,6 @@ def httpsPost(url, resource, params, logger):
             conn.request("POST", resource, temp_params, headers)
             response = conn.getresponse()
             data = response.read().decode('utf-8')
-            params.clear()
             conn.close()
             return json.loads(data)
         except:
@@ -95,5 +94,15 @@ class sqlLog:
                   'my_cny real, my_btc real)')
         c.execute('INSERT INTO price VALUES (?,?,?,?,?,?,?)',
                   (date, buy, last, sell, vol, my_cny, my_btc))
+        conn.commit()
+        conn.close()
+    def trade(self, date, symbol, type, price, amount):
+        conn = sqlite3.connect(self.__getDbFile())
+        c = conn.cursor()
+        c.execute('CREATE TABLE IF NOT EXISTS trade '
+                  '(date integer, symbol text, type text, '
+                  'price real, amount real)')
+        c.execute('INSERT INTO trade VALUES (?,?,?,?,?)',
+                  (date, symbol, type, price, amount))
         conn.commit()
         conn.close()
