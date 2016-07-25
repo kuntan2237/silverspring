@@ -37,10 +37,11 @@ logLevel: DEBUG
 showLog: TRUE
 top: 5185.77
 bottom: 2335
-stop: 2000
+prin: 5000
+step: 0.01
 
 [PRICE]
-enable: yes
+enable: no
 desc: Get on okcoin.cn
 apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

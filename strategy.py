@@ -35,49 +35,67 @@ def halfBalanced(subject, param, logger):
 
 # Grid trading
 def gradTrading(subject, param, logger):
-    result = {}
     MIN_BTC = 0.01
     try:
         top = float(param['top'])
         btm = float(param['bottom'])
-        stop = float(param['stop'])
+        prin = float(param['prin'])
+        step = float(param['step'])
     except ValueError:
-        logger.error('Incorrect top and bottom price, stop trade...')
+        logger.error('Incorrect parameters top/bottom/prin/step...')
         return False
-
     # get data
     info = subject.getAccount()
     price = subject.getSpotQuote()
     total = info['cny'] / price['last'] + info['btc']
     logger.info('Current CNY %.2f, BTC %.4f, total CNY %.2f'
                 % (info['cny'], info['btc'], total * price['last']))
-
-    # stop loss
-    if total * price['last'] <= stop:
-        logger.critical('STOP LOSS at %d !!!' % (total * price['last']))
+    # stop out of grid
+    if price['last'] < btm or price['last'] > top:
+        logger.warning('Stop trade at %.2f, out of grid %.2f ~ %.2f '
+                       % (price['last'], btm, top))
         return True
-
-    # check signal
-    currPos = info['btc'] / total * 100
-    expPos = (1 - (price['last'] - btm) / (top - btm)) * 100
-    logger.debug('Current position %d%%, expect %d%%' % (currPos, expPos))
-    expBtc = total * expPos / 100
-    if info['btc'] < expBtc:
-        logger.debug('Need buy %.4f BTC, threashold %.2f'
-                    % (abs(info['btc'] - expBtc), MIN_BTC))
-    else:
-        logger.debug('Need sell %.4f BTC, threashold %.2f'
-                    % (info['btc'] - expBtc, MIN_BTC))
-
-    # trade
-    if abs(info['btc'] - expBtc) < MIN_BTC:
-        result['result'] = True
-        logger.debug('Does not reach threashold, do nothing')
-    else: # send out trade
-        result = subject.tradeMarketPrice('btc_cny', \
-                                          info['btc'] - expBtc, \
-                                          price['last'])
-        logger.info('Trading completed, result %r', result)
+    # initial trade, return if this is first check
+    try:
+        preStp = param['prevStep']
+        tdBtc = param['tdStp']
+    except KeyError:
+        logger.info('Initial position with top %.2f, bottem %.2f, '
+                    'principle %.2f, step %.2f'
+                    % (top, btm, prin, step))
+        curStp = int((1 - (price['last'] - btm) / (top - btm)) / step)
+        expBtc = (curStp * step) * prin / price['last']
+        if info['btc'] < expBtc:
+            logger.debug('Need buy %.4f BTC, threashold %.2f'
+                         % (abs(info['btc'] - expBtc), MIN_BTC))
+        else:
+            logger.debug('Need sell %.4f BTC, threashold %.2f'
+                         % (info['btc'] - expBtc, MIN_BTC))
+        if abs(info['btc'] - expBtc) < MIN_BTC:
+            result = True
+            logger.debug('Does not reach threashold, do nothing')
+        else: # send out trade
+            result = subject.tradeMarketPrice('btc_cny', \
+                                              info['btc'] - expBtc, \
+                                              price['last'])
+            logger.info('Trading completed, result %r', result)
+        param['prevStep'] = curStp
+        param['tdStp'] = round(prin * step / price['last'], 4)
+        if param['tdStp'] < MIN_BTC:
+            logger.critical('Unproper principle and steps, too concentrated.')
+            return False
+        else:
+            return result
+    # Check signal
+    curStp = int((1 - (price['last'] - btm) / (top - btm)) / step)
+    if curStp == preStp:
+        return True
+    logger.info('Trade grad %d -> %d' % (preStp, curStp))
+    # Trade
+    result = subject.tradeMarketPrice('btc_cny', (preStp - curStp) * tdBtc, \
+                                      price['last'])
+    logger.info('Trading completed, result %r', result)
+    param['prevStep'] = curStp
     return result
 
 # Get BTC price
