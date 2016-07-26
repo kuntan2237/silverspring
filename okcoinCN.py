@@ -46,6 +46,9 @@ class okcoinCN:
         if result['result']:
             sqlLog().trade(int(time.time()), params['symbol'], params['type'],
                            price, amount)
+        else:
+            self.__logger.warning('Trade FAILED params %s, result %s'
+                            % (params, result))
         return result['result']
     
     def getAccount(self):

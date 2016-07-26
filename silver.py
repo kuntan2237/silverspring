@@ -20,7 +20,7 @@ from common import *
 from strategy import *
 from okcoinCN import *
 
-TRADE_INTERVAL=10
+TRADE_INTERVAL=30
 
 BASE_DIR = os.path.dirname(__file__)
 CONF_FILE = os.path.join(BASE_DIR, 'config')

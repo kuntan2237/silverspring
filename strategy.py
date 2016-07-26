@@ -80,7 +80,7 @@ def gradTrading(subject, param, logger):
                                               price['last'])
             logger.info('Trading completed, result %r', result)
         param['prevStep'] = curStp
-        param['tdStp'] = round(prin * step / price['last'], 2)
+        param['tdStp'] = round(prin * step / price['last'], 3)
         if param['tdStp'] < MIN_BTC:
             logger.critical('Unproper principle and steps, too concentrated.')
             return False
@@ -95,7 +95,7 @@ def gradTrading(subject, param, logger):
     result = subject.tradeMarketPrice('btc_cny', (preStp - curStp) * tdBtc, \
                                       price['last'])
     logger.info('Trading completed, result %r', result)
-    param['prevStep'] = curStp
+    if result: param['prevStep'] = curStp
     return result
 
 # Get BTC price
