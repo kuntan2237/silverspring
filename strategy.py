@@ -41,6 +41,8 @@ def gradTrading(subject, param, logger):
         btm = float(param['bottom'])
         prin = float(param['prin'])
         step = float(param['step'])
+        stop = float(param['stop'])
+        stpPrc = (top - btm) * step
     except ValueError:
         logger.error('Incorrect parameters top/bottom/prin/step...')
         return False
@@ -54,10 +56,16 @@ def gradTrading(subject, param, logger):
     if price['last'] < btm or price['last'] > top:
         logger.warning('Stop trade at %.2f, out of grid %.2f ~ %.2f '
                        % (price['last'], btm, top))
-        return True
+        if price['last'] <= stop:
+            logger.critical('EXIT TRADE AT PRICE %.2f CHECK YOUR ACCOUNT !!!'
+                            % price['last'])
+            return False
+        else:
+            return True
     # initial trade, return if this is first check
     try:
         preStp = param['prevStep']
+        prePrc = param['prevPrice']
         tdBtc = param['tdStp']
     except KeyError:
         logger.info('Initial position with top %.2f, bottem %.2f, '
@@ -80,6 +88,7 @@ def gradTrading(subject, param, logger):
                                               price['last'])
             logger.info('Trading completed, result %r', result)
         param['prevStep'] = curStp
+        param['prevPrice'] = top - curStp * stpPrc
         param['tdStp'] = round(prin * step / price['last'], 3)
         if param['tdStp'] < MIN_BTC:
             logger.critical('Unproper principle and steps, too concentrated.')
@@ -88,14 +97,17 @@ def gradTrading(subject, param, logger):
             return result
     # Check signal
     curStp = int((1 - (price['last'] - btm) / (top - btm)) / step)
-    if curStp == preStp:
+    if curStp == preStp or abs(prePrc - price['last']) < stpPrc:
         return True
-    logger.info('Trade grad %d -> %d' % (preStp, curStp))
     # Trade
+    logger.info('Trade grad %d -> %d price %.2f -> %.2f'
+                % (preStp, curStp, prePrc, price['last']))
     result = subject.tradeMarketPrice('btc_cny', (preStp - curStp) * tdBtc, \
                                       price['last'])
     logger.info('Trading completed, result %r', result)
-    if result: param['prevStep'] = curStp
+    if result:
+        param['prevStep'] = curStp
+        param['prevPrice'] = price['last']
     return result
 
 # Get BTC price
