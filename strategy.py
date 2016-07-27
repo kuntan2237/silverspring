@@ -118,5 +118,6 @@ def getPrice(subject, param, logger):
     price = subject.getSpotQuote()
     conn.price(price['date'], price['buy'], price['last'], price['sell'],
                price['vol'], info['cny'], info['btc'])
-    logger.info('Current price saved.')
+    logger.info('Price saved at %s'
+                % datetime.datetime.fromtimestamp(price['date']).strftime('%c'))
     return True

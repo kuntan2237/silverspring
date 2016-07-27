@@ -56,8 +56,8 @@ class okcoinCN:
         data = self.__API_userinfo()
         account['usd'] = 0.0
         for x in ['cny', 'btc', 'ltc']:
-            account[x] = float(data['info']['funds']['free'][x] \
-                               + data['info']['funds']['freezed'][x])
+            account[x] = float(data['info']['funds']['free'][x]) \
+                         + float(data['info']['funds']['freezed'][x])
         return account
 
     def getSpotQuote(self):
