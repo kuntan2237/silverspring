@@ -7,10 +7,12 @@ from common import *
 
 class okcoinCN:
     # Quotation
-    __TICKER   = '/api/v1/ticker.do'
+    __TICKER    = '/api/v1/ticker.do'
     # Transaction
-    __USERINFO = '/api/v1/userinfo.do'
-    __TRADE    = '/api/v1/trade.do'
+    __USERINFO  = '/api/v1/userinfo.do'
+    __TRADE     = '/api/v1/trade.do'
+    __CNCLORDER = '/api/v1/cancel_order.do'
+    __ORDERINFO = '/api/v1/order_info.do'
 
     def __init__(self, param, logger):
         self.__url = 'www.okcoin.cn'
@@ -51,6 +53,22 @@ class okcoinCN:
                             % (params, result))
         return result['result']
     
+    def __API_orderinfo(self, symbol, orderId):
+        params ={}
+        params['api_key'] = self.__apiKey
+        params['symbol'] = symbol
+        params['order_id'] = orderId
+        params['sign'] = signMd5(params, self.__secretKey)
+        return httpsPost(self.__url, self.__ORDERINFO, params, self.__logger)
+
+    def __API_cancelOrder(self, symbol, orderId):
+        params ={}
+        params['api_key'] = self.__apiKey
+        params['symbol'] = symbol
+        params['order_id'] = orderId
+        params['sign'] = signMd5(params, self.__secretKey)
+        return httpsPost(self.__url, self.__CNCLORDER, params, self.__logger)
+
     def getAccount(self):
         account = {}
         data = self.__API_userinfo()
@@ -79,3 +97,14 @@ class okcoinCN:
 
     def tradeLimitPrice(self, symbol, amount, price):
         pass
+
+    def getOpenOrder(self, symbol, id):
+        result = self.__API_orderinfo(symbol, id)
+        if result['result']:
+            return result['orders']
+        else:
+            return {}
+
+    def cancelOrder(self, symbol, id):
+        result = self.__API_cancelOrder(symbol, id)
+        return result['result']
