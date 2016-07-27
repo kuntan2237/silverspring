@@ -95,8 +95,8 @@ class okcoinCN:
                             % (amount, price, result))
         return result
 
-    def tradeLimitPrice(self, symbol, amount, price):
-        pass
+    def tradeLimitPrice(self, symbol, direction, amount, price):
+        return self.__API_trade(symbol, direction, amount, price)
 
     def getOpenOrder(self, symbol, id):
         result = self.__API_orderinfo(symbol, id)

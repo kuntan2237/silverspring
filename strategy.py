@@ -37,54 +37,83 @@ def halfBalanced(subject, param, logger):
 def gradTrading(subject, param, logger):
     # collect parameters
     try:
-        top = float(param['top'])
-        btm = float(param['bottom'])
-        asset = float(param['asset'])
-        step = float(param['step'])
-        stop = float(param['stop'])
-        assetStep = (top - btm) * step
-    except ValueError:
-        logger.error('Incorrect parameters ...')
+        delta = float(param['delta'])
+        cnyUnit = float(param['netunit'])
+        depth = int(param['netdepth'])
+        losser = float(param['stoploss'])
+    except ValueError as e:
+        logger.error('Incorrect parameters ... ' + e)
         return False
     # get accout information
     info = subject.getAccount()
     price = subject.getSpotQuote()
     total = info['cny'] / price['last'] + info['btc']
-    logger.info('Current CNY %.2f, BTC %.4f, total CNY %.2f'
+    logger.info('Account info: CNY %.2f, BTC %.4f, TOTAL CNY %.2f'
                 % (info['cny'], info['btc'], total * price['last']))
-    openOrders = subject.getOpenOrder('btc_cny', '-1')
     # !!! STOP LOSS !!!
-    if price['last'] <= stop:
-        logger.critical('STOP LOSS AT PRICE %.2f !!!' % price['last'])
+    if total * price['last'] <= losser:
+        logger.critical('STOP LOSS AT total asset %.2f !!!'
+                        % (total * price['last']))
         return False
-    # ! PAUSE OUT OF GRID !
-    if price['last'] < btm or price['last'] > top:
-        logger.warning('PAUSE TRADE AT %.2f, OUT OF GRID %.2f ~ %.2f'
-                       % (price['last'], btm, top))
-        return True
     # initial trade
     try:
+        base = param['base']
+        btm = base - delta * depth
+        top = base + delta * depth
+        # ! PAUSE OUT OF GRID !
+        if price['last'] < btm or price['last'] > top:
+            logger.warning('Unilateral quotation happened ...')
+            param.pop('grid')
         gridOrders = param['grid']
     except KeyError: # First loop
-        # Setup position
-        gap = info['btc'] - (top - price['last']) / (top - btm) * total
+        # Setup position to 50/50
+        gap = info['btc'] - total / 2
         subject.tradeMarketPrice('btc_cny', gap, price['last'])
         logger.info('Try to make up gap BTC %.4f' % gap)
         # Clear exist orders
-#        for order in openOrders:
-#            result = subject.cancelOrder('btc_cny', order['order_id'])
-#            logger.info('Cancel order ID: %d, result %r'
-#                        % (order['order_id'], result))
+        openOrders = subject.getOpenOrder('btc_cny', '-1')
+        for order in openOrders:
+            result = subject.cancelOrder('btc_cny', order['order_id'])
+            logger.info('Cancel order ID: %d, result %r'
+                        % (order['order_id'], result))
         # Generate grid orders
         gridOrders = {}
-        for idx in range(int(1 / step / 2), int(-1 / step / 2), -1):
+        for idx in range(-depth, depth + 1):
             gridOrders[idx] = {}
-            gridOrders[idx]['price'] = (top + btm) / 2 + assetStep * idx
+            gridOrders[idx]['price'] = base + delta * idx
             gridOrders[idx]['orderId'] = 0
             gridOrders[idx]['status'] = -1
+        param['orders'] = gridOrders
+        param['latest_index'] = 0
         return True
-    # Check and place grid orders
+    # update order status if exist
+    latest = param['latest_index']
+    for (idx, order) in gridOrders:
+        if order['orderId'] != 0:
+            result = subject.getOpenOrder('btc_cny', order['orderId'])
+            order['status'] = result['status']
+            # Get the latest trade, or the nearest grid to current price ?
+            if order['status'] == 2 \
+               and abs(order['price'] - price['latest'] < \
+                       abs(gridOrders[latest]['price'] - price['latest'])):
+                latest = idx
+    # renew old orders or create if ID == 0
+    for (idx, order) in gridOrders:
+        if idx == latest:
+            continue
+        if order['orderId'] == 0 or order['status'] == 2:
+            if price['last'] > order['price']:
+                direction = 'buy'
+            else:
+                direction = 'sell'
+            result = subject.tradeLimitPrice('btc_cny', direction,
+                                             cnyUnit / price['last'],
+                                             order['price'])
+            if result['result']:
+                order['orderId'] = result['order_id']
+    param['latest_index'] = latest
     return True
+
 '''
     # stop out of grid
     # initial trade, return if this is first check

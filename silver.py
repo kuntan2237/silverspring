@@ -86,9 +86,9 @@ if __name__ == "__main__":
                            file = os.path.join(LOG_DIR, inst + '.log'),
                            console = not globCon and con)
         thread = tradeThread(param, tdLogger)
-        thread.run()
-        #thread.start()
-        #threads.append(thread)
+        #thread.run()
+        thread.start()
+        threads.append(thread)
 
     # Wait for all threads to complete
     for t in threads:
