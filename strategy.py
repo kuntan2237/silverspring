@@ -34,16 +34,14 @@ def halfBalanced(subject, param, logger):
     return result
 
 # Grid trading
-def gradTrading(subject, param, logger):
+# delta * depth * 2 <= (movement in last x days)
+# unit * depth * 2 <= (total usable assets in RMB)
+def gridTrading(subject, param, logger):
     # collect parameters
-    try:
-        delta = float(param['delta'])
-        cnyUnit = float(param['netunit'])
-        depth = int(param['netdepth'])
-        losser = float(param['stoploss'])
-    except ValueError as e:
-        logger.error('Incorrect parameters ... ' + e)
-        return False
+    delta = float(param['delta'])
+    cnyUnit = float(param['netunit'])
+    depth = int(param['netdepth'])
+    losser = float(param['stoploss'])
     # get accout information
     info = subject.getAccount()
     price = subject.getSpotQuote()
@@ -58,24 +56,26 @@ def gradTrading(subject, param, logger):
     # initial trade
     try:
         base = param['base']
-        btm = base - delta * depth
-        top = base + delta * depth
-        # ! PAUSE OUT OF GRID !
-        if price['last'] < btm or price['last'] > top:
+        # ! RESET GRID OF GRID !
+        if abs(price['last'] - base) / delta > depth:
             logger.warning('Unilateral quotation happened ...')
-            param.pop('grid')
-        gridOrders = param['grid']
+            param['delta'] = str(delta + 1)
+            logger.warning('Reset GRID with delta %s' % param['delta'])
+            param.pop('orders')
+        gridOrders = param['orders']
+        logger.info('Order info: price drop in idx %d'% param['latest_index'])
+        logger.debug('Order info: price drop in order %r'
+                    % gridOrders[param['latest_index']])
     except KeyError: # First loop
         # Setup position to 50/50
         gap = info['btc'] - total / 2
+        base = price['last']
         subject.tradeMarketPrice('btc_cny', gap, price['last'])
         logger.info('Try to make up gap BTC %.4f' % gap)
         # Clear exist orders
         openOrders = subject.getOpenOrder('btc_cny', '-1')
         for order in openOrders:
             result = subject.cancelOrder('btc_cny', order['order_id'])
-            logger.info('Cancel order ID: %d, result %r'
-                        % (order['order_id'], result))
         # Generate grid orders
         gridOrders = {}
         for idx in range(-depth, depth + 1):
@@ -84,21 +84,29 @@ def gradTrading(subject, param, logger):
             gridOrders[idx]['orderId'] = 0
             gridOrders[idx]['status'] = -1
         param['orders'] = gridOrders
+        param['base'] = base
         param['latest_index'] = 0
-        return True
     # update order status if exist
     latest = param['latest_index']
-    for (idx, order) in gridOrders:
+    for idx, order in gridOrders.items():
         if order['orderId'] != 0:
             result = subject.getOpenOrder('btc_cny', order['orderId'])
-            order['status'] = result['status']
+            order['status'] = result[0]['status']
             # Get the latest trade, or the nearest grid to current price ?
             if order['status'] == 2 \
-               and abs(order['price'] - price['latest'] < \
-                       abs(gridOrders[latest]['price'] - price['latest'])):
+               and abs(order['price'] - price['last']) < \
+                       abs(gridOrders[latest]['price'] - price['last']):
+                logger.info('Index %d Closed, prev index %d' % (idx, latest))
+                logger.debug('Prev idx %d , %r' % (latest, gridOrders[latest]))
+                logger.debug('Curr idx %d , %r' % (idx, gridOrders[idx]))
+                sqlLog().trade(int(time.time()),
+                               result[0]['symbol'],
+                               result[0]['type'],
+                               result[0]['price'],
+                               result[0]['deal_amount'])
                 latest = idx
     # renew old orders or create if ID == 0
-    for (idx, order) in gridOrders:
+    for (idx, order) in gridOrders.items():
         if idx == latest:
             continue
         if order['orderId'] == 0 or order['status'] == 2:
@@ -114,52 +122,6 @@ def gradTrading(subject, param, logger):
     param['latest_index'] = latest
     return True
 
-'''
-    # stop out of grid
-    # initial trade, return if this is first check
-    try:
-        preStp = param['prevStep']
-        prePrc = param['prevPrice']
-        tdBtc = param['tdStp']
-    except KeyError:
-        logger.info('Initial position with top %.2f, bottem %.2f, '
-                    'principle %.2f, step %.2f'
-                    % (top, btm, prin, step))
-        curStp = int((1 - (price['last'] - btm) / (top - btm)) / step)
-        expBtc = (curStp * step) * prin / price['last']
-        if info['btc'] < expBtc:
-            logger.debug('Need buy %.4f BTC, threashold %.2f'
-                         % (abs(info['btc'] - expBtc), MIN_BTC))
-        else:
-            logger.debug('Need sell %.4f BTC, threashold %.2f'
-                         % (info['btc'] - expBtc, MIN_BTC))
-        if abs(info['btc'] - expBtc) < MIN_BTC:
-            result = True
-            logger.debug('Does not reach threashold, do nothing')
-        else: # send out trade
-        param['prevStep'] = curStp
-        param['prevPrice'] = top - curStp * stpPrc
-        param['tdStp'] = round(prin * step / price['last'], 3)
-        if param['tdStp'] < MIN_BTC:
-            logger.critical('Unproper principle and steps, too concentrated.')
-            return False
-        else:
-            return result
-    # Check signal
-    curStp = int((1 - (price['last'] - btm) / (top - btm)) / step)
-    if curStp == preStp or abs(prePrc - price['last']) < stpPrc:
-        return True
-    # Trade
-    logger.info('Trade grad %d -> %d price %.2f -> %.2f'
-                % (preStp, curStp, prePrc, price['last']))
-    result = subject.tradeMarketPrice('btc_cny', (preStp - curStp) * tdBtc, \
-                                      price['last'])
-    logger.info('Trading completed, result %r', result)
-    if result:
-        param['prevStep'] = curStp
-        param['prevPrice'] = price['last']
-    return result
-'''
 # Get BTC price
 def getPrice(subject, param, logger):
     conn = sqlLog()

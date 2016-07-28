@@ -32,16 +32,16 @@ desc: Grid trading on okcoin.cn
 apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 exchange: okcoinCN
-strategy: gradTrading
+strategy: gridTrading
 logLevel: DEBUG
 showLog: TRUE
-delta: 5.0
-netUnit: 400
+delta: 17.5
+netUnit: 225
 netDepth: 10
-stopLoss: 4000
+stopLoss: 4300
 
 [PRICE]
-enable: no
+enable: yes
 desc: Get on okcoin.cn
 apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

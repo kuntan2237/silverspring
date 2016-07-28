@@ -12,7 +12,6 @@
 import os
 import sys
 import time
-import logging
 import configparser
 import threading
 
@@ -20,7 +19,7 @@ from common import *
 from strategy import *
 from okcoinCN import *
 
-TRADE_INTERVAL=30
+TRADE_INTERVAL=60
 
 BASE_DIR = os.path.dirname(__file__)
 CONF_FILE = os.path.join(BASE_DIR, 'config')

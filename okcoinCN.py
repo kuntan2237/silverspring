@@ -2,7 +2,6 @@
 # API: https://www.okcoin.cn/about/rest_api.do
 # Error code : https://www.okcoin.cn/about/rest_request.do
 
-import logging
 from common import *
 
 class okcoinCN:
@@ -45,13 +44,10 @@ class okcoinCN:
             
         params['sign'] = signMd5(params, self.__secretKey)
         result = httpsPost(self.__url, self.__TRADE, params, self.__logger)
-        if result['result']:
-            sqlLog().trade(int(time.time()), params['symbol'], params['type'],
-                           price, amount)
-        else:
-            self.__logger.warning('Trade FAILED params %s, result %s'
+        if not result['result']:
+            self.__logger.warning('Place order FAILED params %s, result %s'
                             % (params, result))
-        return result['result']
+        return result
     
     def __API_orderinfo(self, symbol, orderId):
         params ={}
@@ -89,14 +85,24 @@ class okcoinCN:
     def tradeMarketPrice(self, symbol, amount, price):
         if amount > 0:
             result = self.__API_trade(symbol, 'sell_market', amount)
+            if result['result']:
+                sqlLog().trade(int(time.time()), symbol,
+                               'sell_market', '', amount)
         else:
-            result = self.__API_trade(symbol, 'buy_market', price=abs(amount) * price)
+            result = self.__API_trade(symbol, 'buy_market',
+                                      price=abs(amount) * price)
+            if result['result']:
+                sqlLog().trade(int(time.time()), symbol, 'buy_market',
+                               abs(amount) * price)
         self.__logger.debug('Trade %.2f with market price CNY %.2f, result %r'
                             % (amount, price, result))
-        return result
+        return result['result']
 
     def tradeLimitPrice(self, symbol, direction, amount, price):
-        return self.__API_trade(symbol, direction, amount, price)
+        result = self.__API_trade(symbol, direction, amount, price)
+        self.__logger.info('Placed %s order %.2f with price CNY %.2f, result %r'
+                           % (direction, amount, price, result['result']))
+        return result
 
     def getOpenOrder(self, symbol, id):
         result = self.__API_orderinfo(symbol, id)
@@ -107,4 +113,6 @@ class okcoinCN:
 
     def cancelOrder(self, symbol, id):
         result = self.__API_cancelOrder(symbol, id)
+        self.__logger.info('Cancel order ID: %d, result %r'
+                           % (id, result['result']))
         return result['result']
