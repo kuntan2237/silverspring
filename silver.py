@@ -7,16 +7,19 @@
 #     common.py   - Independent tools like http/https and checksum
 #     strategy.py - trading strategies
 #     okcoinCN.py - okcoin.cn APIs
+#     config.example - an example of config file used by project
 
 import os
 import sys
 import time
-import logging
 import configparser
+import threading
 
 from common import *
 from strategy import *
 from okcoinCN import *
+
+TRADE_INTERVAL=60
 
 BASE_DIR = os.path.dirname(__file__)
 CONF_FILE = os.path.join(BASE_DIR, 'config')
@@ -39,9 +42,34 @@ def getConfig():
                 sys.exit(-1)
     return dict
 
+class tradeThread (threading.Thread):
+    def __init__(self, param, logger):
+        threading.Thread.__init__(self)
+        self.param = param
+        self.logger = logger
+    def run(self):
+        self.logger.info('Trade started.')
+        self.logger.info(self.param['desc'])
+
+        # check stragety enabled flag
+        if self.param['enable'].lower() != 'yes':
+            self.logger.info('Strategy disabled by config file')
+            rt = False
+        else:
+            rt = True
+
+        while rt:
+            exchange = eval(self.param['exchange'])(self.param, self.logger)
+            rt = eval(self.param['strategy'])(exchange, self.param, self.logger)
+            self.logger.debug('Sleep %d seconds...' % TRADE_INTERVAL)
+            time.sleep(TRADE_INTERVAL)
+
+        self.logger.info('Trade terminated.')
+
 if __name__ == "__main__":
     conf = getConfig()
     globConf = conf.pop('GLOBAL')
+    threads = []
 
     globCon = True if globConf['showlog'].lower() == 'true' else False
     logger = getLogger('SILV', globConf['loglevel'],
@@ -51,20 +79,17 @@ if __name__ == "__main__":
 
     # start trading instances
     for inst, param in conf.items():
-        loop = True
         # setup stragety logs
         con = True if param['showlog'].lower() == 'true' else False
-        logger = getLogger('SILV.' + inst, param['loglevel'],
+        tdLogger = getLogger('SILV.' + inst, param['loglevel'],
                            file = os.path.join(LOG_DIR, inst + '.log'),
                            console = not globCon and con)
-        logger.info('Starting trade: ' + inst)
-        logger.info('Trade description: ' + param['desc'])
-        # check stragety enabled flag
-        if param['enable'].lower() != 'yes':
-            logger.info('Strategy disabled by config file')
-            continue
-        while loop:
-            exchange = eval(param['exchange'])(param, logger)
-            loop = eval(param['strategy'])(exchange, param, logger)
-            logger.debug('Sleep 10 seconds...')
-            time.sleep(10)
+        thread = tradeThread(param, tdLogger)
+        #thread.run()
+        thread.start()
+        threads.append(thread)
+
+    # Wait for all threads to complete
+    for t in threads:
+        t.join()
+    logger.info('ALL TRADING THREADS STOPPED!')
