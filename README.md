@@ -18,7 +18,8 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 
 # How To Start
 
-1. Copy config.sample to config, don't forget to change your apikey and secretkey
+1. This project requires python3 installed
+ * Copy config.sample to config, don't forget to update your apikey and secretkey
  * Set ./silver.py to proper permission and start it
 
 # Features
@@ -27,6 +28,7 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 * Strategies
 	- 50/50 balanced
 	- Grid trade
+	- Collect price data in sqlite3
 
 # To Be Implemented
 * [ ] GUI
@@ -37,9 +39,9 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 - [ ] Multiple trading strategy in single accout
 - [ ] Calculate GRID profits
 
-## 2.1 (Target at WW30'16)
+## 2.1 (Released at WW31.5'16)
 - [Feature] Multi-threading for strategies
-- [Feature] Sqlite database
+- [Feature] Enable sqlite database
 - [Feature] History price data
 - [Fix #8] Price quotation error when there's open order
 - [Enhancement] Rewrite Grid strategy
