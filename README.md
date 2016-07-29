@@ -29,13 +29,22 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 	- Grid trade
 
 # To Be Implemented
-* [ ] Quotation database
-* [ ] Multiple position in single accout
 * [ ] GUI
 * [ ] Multiple Index
 
 # Release Plan
-## 2.0 (Target at WW28'16)
+## 2.2 (Target to WW34.1'16)
+- [ ] Multiple trading strategy in single accout
+- [ ] Calculate GRID profits
+
+## 2.1 (Target at WW30'16)
+- [Feature] Multi-threading for strategies
+- [Feature] Sqlite database
+- [Feature] History price data
+- [Fix #8] Price quotation error when there's open order
+- [Enhancement] Rewrite Grid strategy
+
+## 2.0 (Released at WW28'16)
 - [Fix #1] Python crash with HTTP request error when network is unstable
 - [Feature] Create genConfigSample.py to generate config.sample
 - [Feature] Grid trade
@@ -43,12 +52,11 @@ Silver Spring is a trading bot and infrastructure for BTC and altcoin exchanges 
 
 >	Type     | Description 
 >	-------- | -------------
-	Critical | That’s bad, you may lose money when you see this
-	Error    | Trade bot is stopped by unavoidable errors
-	Warning  | Messages needs attention, unexpected behavior happened
-	Info     | For user's information
-	Debug    | Use this for developing this project
-
+	CRITICAL | That’s bad, you may lose money when you see this
+	ERROR    | Trade bot is stopped by unavoidable errors
+	WARNING  | Messages needs attention, unexpected behavior happened
+	INFO     | For user's information
+	DEBUG    | Use this for developing this project
 
 ## 1.1 (Released at WW27'16)
 - [Fix #2] Exit with buy_market

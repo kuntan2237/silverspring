@@ -23,7 +23,7 @@ apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 exchange: okcoinCN
 strategy: halfBalanced
-logLevel: DEBUG
+logLevel: INFO
 showLog: TRUE
 
 [GRID]
@@ -32,9 +32,20 @@ desc: Grid trading on okcoin.cn
 apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 exchange: okcoinCN
-strategy: gradTrading
+strategy: gridTrading
 logLevel: DEBUG
 showLog: TRUE
-top: 5185.77
-bottom: 2335
-stop: 2000
+delta: 17.5
+netUnit: 225
+netDepth: 10
+stopLoss: 4300
+
+[PRICE]
+enable: yes
+desc: Get on okcoin.cn
+apikey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+secretkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+exchange: okcoinCN
+strategy: getPrice
+logLevel: INFO
+showLog: TRUE
