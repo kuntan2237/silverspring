@@ -67,15 +67,15 @@ def gridTrading(subject, param, logger):
         logger.debug('Order info: price drop in order %r'
                     % gridOrders[param['latest_index']])
     except KeyError: # First loop
+        # Clear exist orders
+        openOrders = subject.getOpenOrder('btc_cny', '-1')
+        for order in openOrders:
+            result = subject.cancelOrder('btc_cny', order['order_id'])
         # Setup position to 50/50
         gap = info['btc'] - total / 2
         base = price['last']
         subject.tradeMarketPrice('btc_cny', gap, price['last'])
         logger.info('Try to make up gap BTC %.4f' % gap)
-        # Clear exist orders
-        openOrders = subject.getOpenOrder('btc_cny', '-1')
-        for order in openOrders:
-            result = subject.cancelOrder('btc_cny', order['order_id'])
         # Generate grid orders
         gridOrders = {}
         for idx in range(-depth, depth + 1):
