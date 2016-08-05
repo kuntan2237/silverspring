@@ -35,10 +35,10 @@ exchange: okcoinCN
 strategy: gridTrading
 logLevel: DEBUG
 showLog: TRUE
-delta: 20
-netUnit: 225
+delta: 40
+netUnit: 200
 netDepth: 10
-stopLoss: 4300
+stopLoss: 4000
 
 [PRICE]
 enable: yes

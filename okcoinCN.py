@@ -82,7 +82,7 @@ class okcoinCN:
             quote[x] = float(data['ticker'][x])
         return quote
 
-    def tradeMarketPrice(self, symbol, amount, price):
+    def tradeMarketPrice(self, symbol, amount, currPrice):
         if amount > 0:
             result = self.__API_trade(symbol, 'sell_market', amount)
             if result['result']:
@@ -90,12 +90,12 @@ class okcoinCN:
                                'sell_market', '', amount)
         else:
             result = self.__API_trade(symbol, 'buy_market',
-                                      price=abs(amount) * price)
+                                      price=abs(amount) * currPrice)
             if result['result']:
                 sqlLog().trade(int(time.time()), symbol, 'buy_market',
-                               abs(amount) * price)
+                               abs(amount) * currPrice, '')
         self.__logger.debug('Trade %.2f with market price CNY %.2f, result %r'
-                            % (amount, price, result))
+                            % (amount, currPrice, result))
         return result['result']
 
     def tradeLimitPrice(self, symbol, direction, amount, price):
